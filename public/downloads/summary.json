@@ -1,0 +1,5 @@
+{
+  "application": "QA Automation Playground",
+  "status": "ready",
+  "scenarios": ["basic-elements", "forms", "tables", "dynamic", "shop"]
+}

@@ -1,0 +1,8 @@
+QA Automation Playground Sample Report
+=====================================
+
+This text download exists so automation can verify file download behavior.
+
+Seed credentials:
+- username: student
+- password: Password123!

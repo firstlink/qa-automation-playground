@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>QA Automation Playground</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">System Under Test</p>
+          <a class="brand-link" href="/" data-nav="/">
+            <span class="brand-mark">Q</span>
+            <div>
+              <h1>QA Automation Playground</h1>
+              <p>Automation-first sandbox for Playwright, Selenium, Copilot, and AI QA demos.</p>
+            </div>
+          </a>
+        </div>
+        <div class="topbar-actions">
+          <button class="ghost-button" type="button" data-nav="/coverage-index" data-testid="top-coverage-link">
+            Coverage Index
+          </button>
+          <button class="ghost-button" type="button" data-nav="/admin" data-testid="top-admin-link">
+            Admin
+          </button>
+          <button class="primary-button" type="button" data-action="reset-app" data-testid="global-reset-button">
+            Reset App State
+          </button>
+        </div>
+      </header>
+
+      <div class="body-grid">
+        <aside class="sidebar" aria-label="Application navigation">
+          <div class="sidebar-panel">
+            <p class="sidebar-title">Routes</p>
+            <nav id="sidebar-nav"></nav>
+          </div>
+        </aside>
+
+        <main class="main-column">
+          <section class="page-hero">
+            <div>
+              <p class="eyebrow" id="page-group">Overview</p>
+              <h2 id="page-title">QA Automation Playground</h2>
+              <p id="page-description">
+                Explore routes, trigger state changes, and inspect outputs designed for automation tooling.
+              </p>
+            </div>
+            <div class="hero-badges" id="hero-badges" aria-label="App status badges"></div>
+          </section>
+
+          <div class="workspace-grid">
+            <section class="component-area" id="component-area" aria-live="polite"></section>
+
+            <aside class="side-panels">
+              <section class="panel output-panel" aria-labelledby="output-title">
+                <div class="panel-header">
+                  <h3 id="output-title">Result Panel</h3>
+                  <span class="panel-chip" id="output-route-chip">Ready</span>
+                </div>
+                <pre id="output-content" data-testid="result-output">Interact with a scenario to populate this panel.</pre>
+              </section>
+
+              <details class="panel debug-panel" id="debug-panel">
+                <summary>Debug Panel</summary>
+                <div id="debug-content"></div>
+              </details>
+            </aside>
+          </div>
+        </main>
+      </div>
+
+      <div id="toast-region" aria-live="polite" aria-atomic="true"></div>
+      <div id="modal-root"></div>
+    </div>
+
+    <script type="module" src="/app.js"></script>
+  </body>
+  </html>

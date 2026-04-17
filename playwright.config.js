@@ -7,7 +7,11 @@ export default defineConfig({
     timeout: 5_000
   },
   fullyParallel: true,
-  reporter: [["list"], ["html", { open: "never" }]],
+  reporter: [
+    ["list"],
+    ["html", { open: "never" }],
+    ["allure-playwright", { resultsDir: "allure-results" }]
+  ],
   use: {
     baseURL: "http://127.0.0.1:4173",
     trace: "on-first-retry",

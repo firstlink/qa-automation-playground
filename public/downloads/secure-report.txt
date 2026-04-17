@@ -1,0 +1,6 @@
+Secure QA Automation Playground Report
+=====================================
+
+This file is intended for the secure download scenario.
+
+Access is gated by the authentication routes inside the playground.

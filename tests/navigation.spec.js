@@ -4,6 +4,7 @@ import { gotoAndExpect } from "./helpers.js";
 const routes = [
   ["/", "Home"],
   ["/admin", "Admin Controls"],
+  ["/ab-testing", "A/B Testing"],
   ["/basic-elements", "Basic Elements"],
   ["/selection-controls", "Selection Controls"],
   ["/buttons", "Buttons"],
@@ -16,6 +17,7 @@ const routes = [
   ["/tables/paginated", "Tables: Paginated"],
   ["/tables/editable", "Tables: Editable"],
   ["/dynamic/loading", "Dynamic: Loading Spinner"],
+  ["/dynamic/content", "Dynamic: Content Rotation"],
   ["/dynamic/delayed-content", "Dynamic: Delayed Content"],
   ["/dynamic/controls", "Dynamic: Enable and Disable"],
   ["/dynamic/disappearing", "Dynamic: Disappearing Elements"],
@@ -28,8 +30,12 @@ const routes = [
   ["/interactions/menu", "Interactions: Multi-level Menu"],
   ["/files/upload", "Files: Upload"],
   ["/files/download", "Files: Download"],
+  ["/files/secure-download", "Files: Secure Download"],
   ["/advanced-locators", "Advanced Locators"],
+  ["/advanced-locators/challenging-dom", "Advanced Locators: Challenging DOM"],
+  ["/advanced-locators/shifting-content", "Advanced Locators: Shifting Content"],
   ["/auth/basic", "Auth: Basic Auth"],
+  ["/auth/digest", "Auth: Digest Auth"],
   ["/auth/session", "Auth: Session Login"],
   ["/auth/protected", "Auth: Protected Page"],
   ["/scrolling/infinite", "Scrolling: Infinite Scroll"],
@@ -49,6 +55,8 @@ const routes = [
   ["/status", "Status"],
   ["/keyboard", "Keyboard"],
   ["/page-events", "Page Events"],
+  ["/page-events/notifications", "Page Events: Notifications"],
+  ["/page-events/onload-error", "Page Events: Onload Error"],
   ["/geolocation", "Geolocation"],
   ["/coverage-index", "Coverage Index"]
 ];

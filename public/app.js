@@ -20,20 +20,50 @@ const AUDIT_ROWS = Array.from({ length: 18 }, (_, index) => ({
 }));
 
 const COVERAGE_MAP = [
-  { feature: "Checkboxes", route: "/selection-controls", status: "Implemented" },
-  { feature: "Dropdown", route: "/selection-controls", status: "Implemented" },
-  { feature: "Drag Drop", route: "/interactions/drag-drop", status: "Implemented" },
-  { feature: "Alerts", route: "/dialogs", status: "Implemented" },
-  { feature: "Frames", route: "/frames/editor", status: "Implemented" },
-  { feature: "Dynamic Loading", route: "/dynamic/loading", status: "Implemented" },
-  { feature: "File Upload", route: "/files/upload", status: "Implemented" },
-  { feature: "File Download", route: "/files/download", status: "Implemented" },
-  { feature: "Infinite Scroll", route: "/scrolling/infinite", status: "Implemented" },
+  { feature: "A/B Testing", route: "/ab-testing", status: "Implemented" },
+  { feature: "Add/Remove Elements", route: "/buttons", status: "Implemented" },
+  { feature: "Basic Auth", route: "/auth/basic", status: "Implemented" },
   { feature: "Broken Images", route: "/status", status: "Implemented" },
+  { feature: "Challenging DOM", route: "/advanced-locators/challenging-dom", status: "Implemented" },
+  { feature: "Checkboxes", route: "/selection-controls", status: "Implemented" },
+  { feature: "Context Menu", route: "/buttons", status: "Implemented" },
+  { feature: "Digest Authentication", route: "/auth/digest", status: "Implemented" },
+  { feature: "Disappearing Elements", route: "/dynamic/disappearing", status: "Implemented" },
+  { feature: "Drag Drop", route: "/interactions/drag-drop", status: "Implemented" },
+  { feature: "Dropdown", route: "/selection-controls", status: "Implemented" },
+  { feature: "Dynamic Content", route: "/dynamic/content", status: "Implemented" },
+  { feature: "Dynamic Controls", route: "/dynamic/controls", status: "Implemented" },
+  { feature: "Dynamic Loading", route: "/dynamic/loading", status: "Implemented" },
+  { feature: "Entry Ad", route: "/dialogs", status: "Implemented" },
+  { feature: "Exit Intent", route: "/dialogs", status: "Implemented" },
+  { feature: "File Download", route: "/files/download", status: "Implemented" },
+  { feature: "File Upload", route: "/files/upload", status: "Implemented" },
+  { feature: "Floating Menu", route: "/scrolling/floating-menu", status: "Implemented" },
+  { feature: "Forgot Password", route: "/forms/forgot-password", status: "Implemented" },
+  { feature: "Form Authentication", route: "/forms/login", status: "Implemented" },
+  { feature: "Frames", route: "/frames/editor", status: "Implemented" },
+  { feature: "Geolocation", route: "/geolocation", status: "Implemented" },
+  { feature: "Horizontal Slider", route: "/interactions/slider", status: "Implemented" },
+  { feature: "Hovers", route: "/interactions/hover", status: "Implemented" },
+  { feature: "Infinite Scroll", route: "/scrolling/infinite", status: "Implemented" },
+  { feature: "Inputs", route: "/basic-elements", status: "Implemented" },
+  { feature: "JQuery UI Menus", route: "/interactions/menu", status: "Implemented" },
+  { feature: "JavaScript Alerts", route: "/dialogs", status: "Implemented" },
+  { feature: "JavaScript Onload Error", route: "/page-events/onload-error", status: "Implemented" },
   { feature: "Key Presses", route: "/keyboard", status: "Implemented" },
-  { feature: "Redirect", route: "/windows", status: "Implemented" },
+  { feature: "Large & Deep DOM", route: "/advanced-locators", status: "Implemented" },
+  { feature: "Multiple Windows", route: "/windows", status: "Implemented" },
+  { feature: "Nested Frames", route: "/frames/nested", status: "Implemented" },
+  { feature: "Notification Messages", route: "/page-events/notifications", status: "Implemented" },
+  { feature: "Redirect Link", route: "/windows", status: "Implemented" },
+  { feature: "Secure File Download", route: "/files/secure-download", status: "Implemented" },
   { feature: "Shadow DOM", route: "/advanced-locators", status: "Implemented" },
-  { feature: "Tables", route: "/tables/sortable", status: "Implemented" }
+  { feature: "Shifting Content", route: "/advanced-locators/shifting-content", status: "Implemented" },
+  { feature: "Slow Resources", route: "/status", status: "Implemented" },
+  { feature: "Sortable Data Tables", route: "/tables/sortable", status: "Implemented" },
+  { feature: "Status Codes", route: "/status", status: "Implemented" },
+  { feature: "Typos", route: "/flaky/typos", status: "Implemented" },
+  { feature: "WYSIWYG Editor", route: "/frames/editor", status: "Implemented" }
 ];
 
 const NAV_GROUP_ORDER = [
@@ -79,6 +109,7 @@ function createDefaultState() {
     },
     auth: {
       basicGranted: false,
+      digestGranted: false,
       sessionLoggedIn: false,
       shopLoggedIn: false
     },
@@ -113,6 +144,7 @@ function createDefaultState() {
     dynamic: {
       optionsLoaded: false,
       spinnerLoaded: false,
+      contentVersion: 1,
       delayedVisible: false,
       controlsEnabled: false,
       disappearingVisible: true,
@@ -131,7 +163,11 @@ function createDefaultState() {
       delayedButtonDelay: null,
       raceResult: null,
       scrollingCount: 12,
-      geo: null
+      geo: null,
+      abVariant: "A",
+      notificationIndex: 0,
+      shiftingContentOffset: false,
+      onloadErrorCaptured: false
     },
     shop: {
       lastOrderId: null
@@ -399,6 +435,10 @@ function rememberNavigation(path) {
   }
 }
 
+function secureDownloadsUnlocked() {
+  return state.auth.sessionLoggedIn || state.auth.basicGranted || state.auth.digestGranted;
+}
+
 function sectionIndexRoute(route) {
   const children = ROUTES.filter((item) => item.parent === route.path);
   return `
@@ -474,6 +514,44 @@ function renderHome() {
           { path: "/interactions", label: "Interactions" },
           { path: "/flaky", label: "Flaky Lab" }
         ])
+      )}
+    </div>
+  `;
+}
+
+function renderABTesting() {
+  const variant = state.ui.abVariant;
+  const headline = variant === "A" ? "Experience Variant A" : "Experience Variant B";
+  const description =
+    variant === "A"
+      ? "This bucket emphasizes concise copy and faster pathing for returning users."
+      : "This bucket emphasizes explanatory copy and guided exploration for new users.";
+
+  return `
+    <div class="component-grid">
+      ${card(
+        "A/B Testing",
+        "Heroku parity experiment page with a visible variant assignment and rebucketing control.",
+        `
+          <div class="notice" data-testid="ab-testing-card">
+            <p><strong>${headline}</strong></p>
+            <p>${description}</p>
+            <p>Assigned variant: <span class="status-chip">${variant}</span></p>
+          </div>
+          <div class="button-row">
+            <button class="primary" type="button" data-action="toggle-ab-variant">Rebucket Visitor</button>
+          </div>
+        `
+      )}
+      ${card(
+        "Parity Notes",
+        "Useful for demos where text assertions need to tolerate variant changes.",
+        `
+          <ul class="plain-list">
+            <li>Stable mode keeps the current variant until you rebucket it.</li>
+            <li>Flaky mode can be used to discuss content-aware assertions.</li>
+          </ul>
+        `
       )}
     </div>
   `;
@@ -1089,6 +1167,54 @@ function renderDisappearingElements() {
   `;
 }
 
+function renderDynamicContentScenario() {
+  const version = state.dynamic.contentVersion;
+  const profiles = [
+    {
+      name: "Avery Chen",
+      note: "Dynamic content card focused on resilient locators and text drift.",
+      tone: "#0f766e"
+    },
+    {
+      name: "Jordan Brooks",
+      note: "A second content block for asserting rerendered text and images.",
+      tone: "#b45309"
+    },
+    {
+      name: "Taylor Smith",
+      note: "A third content block to emulate shuffled content sections.",
+      tone: "#0b4f6c"
+    }
+  ];
+
+  const cards = profiles.map((profile, index) => profiles[(index + version - 1) % profiles.length]);
+
+  return `
+    ${card(
+      "Dynamic Content",
+      "Refresh the content blocks to rotate people, blurbs, and images the way the Heroku page does.",
+      `
+        <div class="component-grid">
+          ${cards
+            .map(
+              (profile, index) => `
+                <article class="notice" data-testid="dynamic-content-card-${index}">
+                  <img src="${createSvgDataUri(profile.name, profile.tone)}" alt="${escapeHtml(profile.name)}" style="width:100%;border-radius:14px;margin-bottom:0.75rem;" />
+                  <p><strong>${escapeHtml(profile.name)}</strong></p>
+                  <p>${escapeHtml(profile.note)}</p>
+                </article>
+              `
+            )
+            .join("")}
+        </div>
+        <div class="button-row">
+          <button class="primary" type="button" data-action="refresh-dynamic-content">Refresh Dynamic Content</button>
+        </div>
+      `
+    )}
+  `;
+}
+
 function renderFramesEditor() {
   return `
     ${card(
@@ -1244,6 +1370,33 @@ function renderDownload() {
   `;
 }
 
+function renderSecureDownload() {
+  return `
+    ${card(
+      "Secure File Download",
+      "Mirrors the Heroku protected-download pattern by requiring an authenticated session or auth grant.",
+      secureDownloadsUnlocked()
+        ? `
+          <div class="notice">
+            Secure downloads are unlocked for this session.
+          </div>
+          <div class="button-row">
+            <a class="button-link secondary" href="/download/summary.json" download>Secure JSON</a>
+            <a class="button-link secondary" href="/download/secure-report.txt" download>Secure Report</a>
+          </div>
+        `
+        : `
+          <div class="notice">Secure downloads are locked. Authenticate first to reveal the protected links.</div>
+          <div class="button-row">
+            ${routeButton("/auth/session", "Start Session", "primary")}
+            ${routeButton("/auth/basic", "Basic Auth")}
+            ${routeButton("/auth/digest", "Digest Auth")}
+          </div>
+        `
+    )}
+  `;
+}
+
 function renderAdvancedLocators() {
   const firstId = dynamicId("duplicate-username-a");
   const secondId = dynamicId("duplicate-username-b");
@@ -1289,6 +1442,102 @@ function renderAdvancedLocators() {
   `;
 }
 
+function renderChallengingDom() {
+  const challengeSeed = state.counters.interactions || 1;
+  const rowData = Array.from({ length: 6 }, (_, index) => ({
+    id: challengeSeed + index,
+    column1: `Iuvaret${index + 1}`,
+    column2: `Apeirian${index + 1}`,
+    column3: `Definiebas${index + 1}`
+  }));
+
+  return `
+    <div class="component-grid">
+      ${card(
+        "Challenging DOM",
+        "A Heroku-style mix of shifting classes, repeated action labels, and table row controls.",
+        `
+          <div class="button-row">
+            <button class="primary-button" type="button" data-action="challenging-dom-top" data-name="Primary action">Primary action</button>
+            <button class="ghost-button" type="button" data-action="challenging-dom-top" data-name="Secondary action">Secondary action</button>
+            <button class="danger-button" type="button" data-action="challenging-dom-top" data-name="Danger action">Danger action</button>
+          </div>
+          <table data-testid="challenging-dom-table">
+            <thead>
+              <tr>
+                <th>Lorem</th>
+                <th>Ipsum</th>
+                <th>Dolor</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rowData
+                .map(
+                  (row) => `
+                    <tr>
+                      <td>${escapeHtml(row.column1)}</td>
+                      <td>${escapeHtml(row.column2)}</td>
+                      <td>${escapeHtml(row.column3)}</td>
+                      <td>
+                        <div class="button-row">
+                          <button class="secondary btn" type="button" data-action="challenging-row-action" data-row="${row.id}" data-mode="edit">edit</button>
+                          <button class="secondary btn" type="button" data-action="challenging-row-action" data-row="${row.id}" data-mode="delete">delete</button>
+                        </div>
+                      </td>
+                    </tr>
+                  `
+                )
+                .join("")}
+            </tbody>
+          </table>
+        `
+      )}
+      ${card(
+        "Why It Matters",
+        "This route is intentionally awkward for brittle selectors.",
+        `
+          <ul class="plain-list">
+            <li>Repeated action labels force scoping to the right row.</li>
+            <li>Generic button classes nudge demos toward semantic locators or table-relative selectors.</li>
+          </ul>
+        `
+      )}
+    </div>
+  `;
+}
+
+function renderShiftingContent() {
+  const shifted = state.ui.shiftingContentOffset;
+  return `
+    <div class="component-grid">
+      ${card(
+        "Shifting Content",
+        "Toggle horizontal shifts to test layout-sensitive automation and visual stability.",
+        `
+          <div class="notice" style="overflow:hidden;">
+            <nav aria-label="Shifting navigation" style="margin-left:${shifted ? "48px" : "0"}; transition: margin-left 180ms ease;">
+              <div class="button-row">
+                <a href="#" class="nav-link" onclick="return false;">Gallery</a>
+                <a href="#" class="nav-link" onclick="return false;">About</a>
+                <a href="#" class="nav-link" onclick="return false;">Contact</a>
+              </div>
+            </nav>
+            <div style="margin-top:1rem; transform:translateX(${shifted ? "42px" : "0"}); transition: transform 180ms ease;">
+              <img src="${createSvgDataUri("Shifting Content", "#d97706")}" alt="Shifted demo art" style="width:100%;border-radius:14px;" />
+            </div>
+          </div>
+          <div class="button-row">
+            <button class="primary" type="button" data-action="toggle-shifting-content">
+              ${shifted ? "Reset content position" : "Shift content"}
+            </button>
+          </div>
+        `
+      )}
+    </div>
+  `;
+}
+
 function renderBasicAuth() {
   return `
     ${card(
@@ -1309,6 +1558,38 @@ function renderBasicAuth() {
             <button class="secondary" type="button" data-action="logout-basic">Clear basic auth</button>
           </div>
         </form>
+      `
+    )}
+  `;
+}
+
+function renderDigestAuth() {
+  const nonce = hashText(`digest:${state.seed}`).toString(16).slice(0, 10);
+  return `
+    ${card(
+      "Digest Authentication",
+      "Simulation of a digest-style challenge using the Heroku demo credentials (`admin` / `admin`).",
+      `
+        <form data-form="digest-auth-form" class="form-grid" data-testid="digest-auth-form">
+          <label class="field">
+            <span>Username</span>
+            <input name="username" type="text" value="admin" />
+          </label>
+          <label class="field">
+            <span>Password</span>
+            <input name="password" type="password" value="admin" />
+          </label>
+          <label class="field">
+            <span>Server nonce</span>
+            <input name="nonce" type="text" value="${nonce}" readonly />
+          </label>
+          <button class="primary" type="submit">Authorize digest request</button>
+        </form>
+        ${
+          state.auth.digestGranted
+            ? '<div class="notice">Digest-auth simulation granted. Secure resources can now be exercised.</div>'
+            : ""
+        }
       `
     )}
   `;
@@ -1771,6 +2052,52 @@ function renderPageEvents() {
   `;
 }
 
+function renderNotificationMessages() {
+  const messages = [
+    "Action successful",
+    "Action unsuccesful, please try again",
+    "Action successful, enjoy the app!",
+    "Action unsuccessful: network lag detected"
+  ];
+  const current = messages[state.ui.notificationIndex % messages.length];
+
+  return `
+    ${card(
+      "Notification Messages",
+      "Heroku-style notification banner that changes when you request a new message.",
+      `
+        <div class="notice" data-testid="notification-banner">
+          <p>${escapeHtml(current)}</p>
+          <div class="button-row">
+            <button class="secondary" type="button" data-action="cycle-notification-message">Click here</button>
+          </div>
+        </div>
+      `
+    )}
+  `;
+}
+
+function renderOnloadError() {
+  return `
+    ${card(
+      "JavaScript Onload Error",
+      "A safe simulation of an onload-time client error, captured in the result panel instead of crashing the app.",
+      `
+        <div class="notice" data-testid="onload-error-card">
+          ${
+            state.ui.onloadErrorCaptured
+              ? "An onload error was captured for this route. Check the result panel for the simulated stack details."
+              : "Open this route to trigger the simulated onload error."
+          }
+        </div>
+        <div class="button-row">
+          <button class="secondary" type="button" data-action="retrigger-onload-error">Trigger again</button>
+        </div>
+      `
+    )}
+  `;
+}
+
 function renderGeolocation() {
   return `
     ${card(
@@ -1851,6 +2178,8 @@ function renderRouteContent(route) {
       return renderHome();
     case "/admin":
       return renderAdmin();
+    case "/ab-testing":
+      return renderABTesting();
     case "/basic-elements":
       return renderBasicElements();
     case "/selection-controls":
@@ -1886,6 +2215,8 @@ function renderRouteContent(route) {
       return renderEditableTable();
     case "/dynamic/loading":
       return renderLoadingScenario();
+    case "/dynamic/content":
+      return renderDynamicContentScenario();
     case "/dynamic/delayed-content":
       return renderDelayedContent();
     case "/dynamic/controls":
@@ -1910,10 +2241,18 @@ function renderRouteContent(route) {
       return renderUpload();
     case "/files/download":
       return renderDownload();
+    case "/files/secure-download":
+      return renderSecureDownload();
     case "/advanced-locators":
       return renderAdvancedLocators();
+    case "/advanced-locators/challenging-dom":
+      return renderChallengingDom();
+    case "/advanced-locators/shifting-content":
+      return renderShiftingContent();
     case "/auth/basic":
       return renderBasicAuth();
+    case "/auth/digest":
+      return renderDigestAuth();
     case "/auth/session":
       return renderSessionAuth();
     case "/auth/protected":
@@ -1952,6 +2291,10 @@ function renderRouteContent(route) {
       return renderKeyboard();
     case "/page-events":
       return renderPageEvents();
+    case "/page-events/notifications":
+      return renderNotificationMessages();
+    case "/page-events/onload-error":
+      return renderOnloadError();
     case "/geolocation":
       return renderGeolocation();
     case "/coverage-index":
@@ -2195,6 +2538,20 @@ function applyRouteSetup(route) {
     if (query.get("source") === "new-tab") {
       notify("New tab", "The page-events route opened in a separate tab.");
     }
+  }
+
+  if (route.path === "/page-events/onload-error" && !state.ui.onloadErrorCaptured) {
+    state.ui.onloadErrorCaptured = true;
+    saveState();
+    const payload = {
+      message: "Simulated onload error",
+      source: "page-events/onload-error",
+      detail: "ReferenceError: undefinedAutomationHook is not defined"
+    };
+    console.error(payload.detail);
+    setOutput("Onload error captured", payload);
+    renderRoute();
+    return;
   }
 
   if (route.path === "/status") {
@@ -2500,6 +2857,60 @@ function handleClick(event) {
 
   if (action === "page-next") {
     state.tables.page = Math.min(Math.ceil(AUDIT_ROWS.length / 5), state.tables.page + 1);
+    saveState();
+    renderRoute();
+    return;
+  }
+
+  if (action === "toggle-ab-variant") {
+    state.ui.abVariant = state.ui.abVariant === "A" ? "B" : "A";
+    saveState();
+    setOutput("A/B assignment updated", { variant: state.ui.abVariant });
+    renderRoute();
+    return;
+  }
+
+  if (action === "refresh-dynamic-content") {
+    state.dynamic.contentVersion += 1;
+    saveState();
+    setOutput("Dynamic content refreshed", { version: state.dynamic.contentVersion });
+    renderRoute();
+    return;
+  }
+
+  if (action === "challenging-dom-top") {
+    setOutput("Challenging DOM action", { button: actionTarget.dataset.name });
+    return;
+  }
+
+  if (action === "challenging-row-action") {
+    setOutput("Challenging DOM row action", {
+      row: Number(actionTarget.dataset.row),
+      mode: actionTarget.dataset.mode
+    });
+    return;
+  }
+
+  if (action === "toggle-shifting-content") {
+    state.ui.shiftingContentOffset = !state.ui.shiftingContentOffset;
+    saveState();
+    setOutput("Shifting content toggled", { shifted: state.ui.shiftingContentOffset });
+    renderRoute();
+    return;
+  }
+
+  if (action === "cycle-notification-message") {
+    state.ui.notificationIndex += 1;
+    saveState();
+    setOutput("Notification message changed", {
+      index: state.ui.notificationIndex
+    });
+    renderRoute();
+    return;
+  }
+
+  if (action === "retrigger-onload-error") {
+    state.ui.onloadErrorCaptured = false;
     saveState();
     renderRoute();
     return;
@@ -2878,6 +3289,14 @@ function handleSubmit(event) {
     return;
   }
 
+  if (formName === "digest-auth-form") {
+    state.auth.digestGranted = payload.username === "admin" && payload.password === "admin";
+    saveState();
+    setOutput("Digest auth result", { granted: state.auth.digestGranted, nonce: payload.nonce });
+    renderRoute();
+    return;
+  }
+
   if (formName === "session-auth-form") {
     state.auth.sessionLoggedIn = authenticate(payload.username, payload.password);
     saveState();
@@ -3063,6 +3482,7 @@ const ROUTES = [
   { path: "/", label: "Home", title: "Home", description: "Launch point for the automation playground and global state overview.", group: "Overview" },
   { path: "/admin", label: "Admin", title: "Admin Controls", description: "Reset the app state and tune stable, flaky, slow, and dynamic-ID modes.", group: "Overview" },
   { path: "/coverage-index", label: "Coverage Index", title: "Coverage Index", description: "PRS mapping between Heroku-style scenarios and implemented routes.", group: "Overview" },
+  { path: "/ab-testing", label: "A/B Testing", title: "A/B Testing", description: "Variant-driven messaging similar to the Heroku A/B Testing example.", group: "Core" },
   { path: "/basic-elements", label: "Basic Elements", title: "Basic Elements", description: "Foundational inputs, submit/reset flows, and simple content assertions.", group: "Core" },
   { path: "/selection-controls", label: "Selection Controls", title: "Selection Controls", description: "Checkboxes, radios, single/multi-selects, and delayed dropdown options.", group: "Core" },
   { path: "/buttons", label: "Buttons", title: "Buttons", description: "Click, double-click, right-click, hover reveal, and long-press scenarios.", group: "Core" },
@@ -3078,6 +3498,7 @@ const ROUTES = [
   { path: "/tables/editable", label: "Editable Table", title: "Tables: Editable", description: "Inline numeric editing with save behavior.", group: "Tables", parent: "/tables" },
   { path: "/dynamic", label: "Dynamic Index", title: "Dynamic Content", description: "Entry point for loading, delayed content, enable/disable, and disappearing-element flows.", group: "Dynamic", nav: false },
   { path: "/dynamic/loading", label: "Loading Spinner", title: "Dynamic: Loading Spinner", description: "Spinner-based loading workflow with visible completion.", group: "Dynamic", parent: "/dynamic" },
+  { path: "/dynamic/content", label: "Dynamic Content", title: "Dynamic: Content Rotation", description: "Rotating content blocks inspired by the Heroku dynamic-content example.", group: "Dynamic", parent: "/dynamic" },
   { path: "/dynamic/delayed-content", label: "Delayed Content", title: "Dynamic: Delayed Content", description: "Content revealed only after a timed wait.", group: "Dynamic", parent: "/dynamic" },
   { path: "/dynamic/controls", label: "Enable/Disable", title: "Dynamic: Enable and Disable", description: "Controls toggle between enabled and disabled states.", group: "Dynamic", parent: "/dynamic" },
   { path: "/dynamic/disappearing", label: "Disappearing", title: "Dynamic: Disappearing Elements", description: "Elements vanish after a controlled delay.", group: "Dynamic", parent: "/dynamic" },
@@ -3093,9 +3514,13 @@ const ROUTES = [
   { path: "/files", label: "Files Index", title: "Files", description: "Entry point for upload and download scenarios.", group: "Files", nav: false },
   { path: "/files/upload", label: "Upload", title: "Files: Upload", description: "File upload selection with observable metadata.", group: "Files", parent: "/files" },
   { path: "/files/download", label: "Download", title: "Files: Download", description: "Download multiple file types from the local server.", group: "Files", parent: "/files" },
+  { path: "/files/secure-download", label: "Secure Download", title: "Files: Secure Download", description: "Protected downloads unlocked by auth scenarios.", group: "Files", parent: "/files" },
   { path: "/advanced-locators", label: "Advanced Locators", title: "Advanced Locators", description: "Shadow DOM, deep DOM, dynamic IDs, and duplicate labels.", group: "Locators" },
+  { path: "/advanced-locators/challenging-dom", label: "Challenging DOM", title: "Advanced Locators: Challenging DOM", description: "Repeated labels and row-relative actions modeled after the Heroku demo.", group: "Locators" },
+  { path: "/advanced-locators/shifting-content", label: "Shifting Content", title: "Advanced Locators: Shifting Content", description: "Layout shifts for selector and visual-regression practice.", group: "Locators" },
   { path: "/auth", label: "Auth Index", title: "Auth", description: "Entry point for basic auth simulation, sessions, and protected content.", group: "Auth", nav: false },
   { path: "/auth/basic", label: "Basic Auth", title: "Auth: Basic Auth", description: "Basic-auth style credential gate simulation.", group: "Auth", parent: "/auth" },
+  { path: "/auth/digest", label: "Digest Auth", title: "Auth: Digest Auth", description: "Digest-style challenge simulation using Heroku parity credentials.", group: "Auth", parent: "/auth" },
   { path: "/auth/session", label: "Session Login", title: "Auth: Session Login", description: "Persistent session login and logout controls.", group: "Auth", parent: "/auth" },
   { path: "/auth/protected", label: "Protected Page", title: "Auth: Protected Page", description: "Protected content unlocked by the session flow.", group: "Auth", parent: "/auth" },
   { path: "/scrolling", label: "Scrolling Index", title: "Scrolling", description: "Entry point for infinite scroll, lazy images, and sticky menu content.", group: "Scrolling", nav: false },
@@ -3118,6 +3543,8 @@ const ROUTES = [
   { path: "/status", label: "Status", title: "Status", description: "HTTP status, broken image, and slow-loading simulations.", group: "Status" },
   { path: "/keyboard", label: "Keyboard", title: "Keyboard", description: "Key press, key up, and input event coverage.", group: "Status" },
   { path: "/page-events", label: "Page Events", title: "Page Events", description: "Onload logging, delayed redirects, and notification messages.", group: "Status" },
+  { path: "/page-events/notifications", label: "Notifications", title: "Page Events: Notifications", description: "Randomized notification messages with a reroll control.", group: "Status" },
+  { path: "/page-events/onload-error", label: "Onload Error", title: "Page Events: Onload Error", description: "Safe simulation of a JavaScript onload error.", group: "Status" },
   { path: "/geolocation", label: "Geolocation", title: "Geolocation", description: "Simulated and browser-backed location output.", group: "Status" }
 ];
 

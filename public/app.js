@@ -2346,7 +2346,11 @@ function handleClick(event) {
 
   const actionTarget = event.target.closest("[data-action]");
   if (!actionTarget) {
-    if (!event.target.closest(".custom-menu")) {
+    if (
+      state.ui.customMenu &&
+      !event.target.closest(".custom-menu") &&
+      !event.target.closest("#context-zone")
+    ) {
       state.ui.customMenu = null;
       saveState();
       renderRoute();

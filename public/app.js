@@ -91,14 +91,8 @@ const TRAINING_MODULES = [
     paths: ["/", "/admin"]
   },
   {
-    id: "forms-auth",
-    title: "Module 2 · Forms And Authentication",
-    note: "Start with the patterns beginners meet first: login, validation, and protected pages.",
-    paths: ["/forms/login", "/forms/register", "/forms/forgot-password", "/auth/basic", "/auth/digest", "/auth/session", "/auth/protected"]
-  },
-  {
     id: "selenium-fundamentals",
-    title: "Module 3 · Selenium UI Fundamentals",
+    title: "Module 2 · Selenium UI Fundamentals",
     note: "Walk through controls one by one: inputs, dropdowns, buttons, dialogs, frames, windows, and tables.",
     paths: [
       "/basic-elements",
@@ -114,6 +108,12 @@ const TRAINING_MODULES = [
       "/tables/editable",
       "/keyboard"
     ]
+  },
+  {
+    id: "forms-auth",
+    title: "Module 3 · Forms And Authentication",
+    note: "After the UI basics, pivot into realistic login, validation, and protected-page flows.",
+    paths: ["/forms/login", "/forms/register", "/forms/forgot-password", "/auth/basic", "/auth/digest", "/auth/session", "/auth/protected"]
   },
   {
     id: "advanced-ui",
@@ -152,14 +152,20 @@ const TRAINING_MODULES = [
   {
     id: "quality-engineering",
     title: "Module 6 · API, Accessibility And Performance",
-    note: "Pivot from UI automation to broader quality engineering topics: API checks, accessibility, responsiveness, and reporting.",
-    paths: ["/api-ui", "/accessibility", "/responsiveness", "/performance", "/reports", "/geolocation"]
+    note: "Broaden the conversation from UI automation into API checks, accessibility, responsive behavior, browser capabilities, and performance.",
+    paths: ["/api-ui", "/accessibility", "/responsiveness", "/geolocation", "/performance"]
   },
   {
     id: "capstone",
     title: "Module 7 · Capstone Shop Flow",
-    note: "Finish with a realistic business flow that ties together auth, product selection, checkout, confirmation, and reporting.",
-    paths: ["/shop/login", "/shop/products", "/shop/cart", "/shop/checkout", "/shop/confirmation", "/coverage-index"]
+    note: "Bring the lessons together with a realistic business flow covering login, product selection, cart handling, checkout, and confirmation.",
+    paths: ["/shop/login", "/shop/products", "/shop/cart", "/shop/checkout", "/shop/confirmation"]
+  },
+  {
+    id: "reporting",
+    title: "Module 8 · Reporting And Coverage",
+    note: "Close the training by showing how test execution turns into evidence with Allure, Playwright reports, and the coverage index.",
+    paths: ["/reports", "/coverage-index"]
   }
 ];
 
@@ -506,9 +512,9 @@ function renderHome() {
         "This sequence mirrors a classroom rhythm: explain a control, demo it, let students try it, then connect it to a bigger testing concept.",
         `
           <ul class="plain-list">
-            <li>Start in Forms and Authentication so students see fast wins and familiar UI patterns.</li>
-            <li>Move to Selenium UI Fundamentals to teach locators, waits, actions, and assertions one component at a time.</li>
-            <li>Then pivot into dynamic content, API, accessibility, responsiveness, performance, and finally reporting.</li>
+            <li>Start with Selenium UI Fundamentals so students learn locators, waits, actions, and assertions one component at a time.</li>
+            <li>Then pivot into Forms and Authentication once the UI basics feel familiar and the flows become more realistic.</li>
+            <li>Finish with API, accessibility, responsiveness, performance, the shop capstone, and finally reporting.</li>
           </ul>
         `
       )}
@@ -516,11 +522,12 @@ function renderHome() {
         "Quick Teaching Jumps",
         "Use these shortcuts when you want to demo a concept live without scrolling through the whole curriculum.",
         linkList([
-          { path: "/basic-elements", label: "Inputs and Forms" },
+          { path: "/basic-elements", label: "Inputs and Form Fields" },
           { path: "/selection-controls", label: "Dropdowns and Checkboxes" },
-          { path: "/dialogs", label: "Alerts and Modals" },
+          { path: "/buttons", label: "Buttons and Actions" },
+          { path: "/forms/login", label: "Complex Login Flow" },
           { path: "/api-ui", label: "API Checks" },
-          { path: "/reports", label: "Reports Module" }
+          { path: "/reports", label: "Final Reporting Module" }
         ])
       )}
     </div>

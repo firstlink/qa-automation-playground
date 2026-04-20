@@ -1,19 +1,19 @@
 :root {
-  --bg: #09111f;
-  --panel: rgba(247, 244, 236, 0.94);
-  --panel-strong: #fffdf9;
-  --line: rgba(14, 32, 56, 0.12);
-  --text: #142033;
-  --muted: #53617a;
-  --accent: #0e7490;
-  --accent-strong: #164e63;
-  --warm: #c67a1f;
+  --bg: #08111d;
+  --panel: rgba(255, 255, 255, 0.76);
+  --panel-strong: rgba(255, 255, 255, 0.94);
+  --line: rgba(15, 23, 42, 0.08);
+  --text: #0f172a;
+  --muted: #475569;
+  --accent: #0284c7;
+  --accent-strong: #0369a1;
+  --warm: #ea580c;
   --danger: #b42318;
   --success: #157347;
-  --sidebar-bg: rgba(9, 17, 31, 0.88);
-  --sidebar-line: rgba(148, 163, 184, 0.16);
-  --shadow: 0 26px 64px rgba(5, 12, 24, 0.2);
-  --radius: 24px;
+  --sidebar-bg: rgba(8, 17, 29, 0.9);
+  --sidebar-line: rgba(148, 163, 184, 0.14);
+  --shadow: 0 24px 70px rgba(15, 23, 42, 0.14);
+  --radius: 26px;
 }
 
 * {
@@ -25,11 +25,19 @@ body {
   margin: 0;
   min-height: 100%;
   background:
-    radial-gradient(circle at top left, rgba(14, 116, 144, 0.22), transparent 30%),
-    radial-gradient(circle at top right, rgba(198, 122, 31, 0.18), transparent 26%),
-    linear-gradient(180deg, #f9f5ed 0%, #eef1f4 48%, #e6ebf2 100%);
+    linear-gradient(rgba(15, 23, 42, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(15, 23, 42, 0.04) 1px, transparent 1px),
+    radial-gradient(circle at top left, rgba(2, 132, 199, 0.18), transparent 28%),
+    radial-gradient(circle at top right, rgba(14, 165, 233, 0.12), transparent 24%),
+    linear-gradient(180deg, #f8fbff 0%, #eff4fb 48%, #e6edf7 100%);
+  background-size:
+    24px 24px,
+    24px 24px,
+    auto,
+    auto,
+    auto;
   color: var(--text);
-  font-family: "Avenir Next", "Helvetica Neue", sans-serif;
+  font-family: "Avenir Next", "Segoe UI Variable", "Helvetica Neue", sans-serif;
 }
 
 body {
@@ -65,10 +73,10 @@ button {
   border: 1px solid var(--line);
   border-radius: calc(var(--radius) + 6px);
   background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(248, 243, 232, 0.92)),
-    linear-gradient(90deg, rgba(14, 116, 144, 0.08), rgba(198, 122, 31, 0.08));
+    linear-gradient(135deg, rgba(255, 255, 255, 0.82), rgba(245, 249, 255, 0.88)),
+    linear-gradient(90deg, rgba(2, 132, 199, 0.08), rgba(14, 165, 233, 0.06));
   box-shadow: var(--shadow);
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(18px);
 }
 
 .eyebrow {
@@ -91,7 +99,8 @@ button {
 .card h3,
 .panel-header h3 {
   margin: 0;
-  font-family: "Iowan Old Style", "Book Antiqua", "Palatino Linotype", serif;
+  font-family: "Avenir Next", "Segoe UI Variable", "Helvetica Neue", sans-serif;
+  letter-spacing: -0.02em;
 }
 
 .brand-link p,
@@ -102,16 +111,17 @@ button {
 
 .brand-mark {
   display: inline-flex;
-  width: 3rem;
-  height: 3rem;
+  width: 3.15rem;
+  height: 3.15rem;
   align-items: center;
   justify-content: center;
-  border-radius: 18px;
-  background: linear-gradient(135deg, var(--accent) 0%, #0b4f6c 100%);
+  border-radius: 20px;
+  background:
+    linear-gradient(135deg, #38bdf8 0%, #0369a1 100%);
   color: white;
   font-size: 1.4rem;
   font-weight: 700;
-  box-shadow: 0 14px 30px rgba(18, 58, 99, 0.24);
+  box-shadow: 0 18px 36px rgba(3, 105, 161, 0.28);
 }
 
 .topbar-actions,
@@ -146,15 +156,15 @@ button {
 .primary-button,
 .card button.primary,
 .button-link.primary {
-  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+  background: linear-gradient(135deg, #0ea5e9, var(--accent-strong));
   color: white;
-  box-shadow: 0 12px 30px rgba(15, 118, 110, 0.22);
+  box-shadow: 0 14px 30px rgba(2, 132, 199, 0.24);
 }
 
 .ghost-button,
 .card button.secondary,
 .button-link.secondary {
-  background: rgba(255, 255, 255, 0.72);
+  background: rgba(255, 255, 255, 0.62);
   border-color: var(--line);
   color: var(--text);
 }
@@ -204,7 +214,8 @@ button {
   top: 1.25rem;
   max-height: calc(100vh - 2.5rem);
   overflow: auto;
-  background: linear-gradient(180deg, rgba(9, 17, 31, 0.96), rgba(17, 30, 51, 0.92));
+  background:
+    linear-gradient(180deg, rgba(8, 17, 29, 0.96), rgba(15, 23, 42, 0.92));
   color: #e8eef8;
   border-color: var(--sidebar-line);
 }
@@ -214,7 +225,7 @@ button {
   color: #f7fafc;
   font-weight: 700;
   font-size: 1.2rem;
-  font-family: "Iowan Old Style", "Book Antiqua", "Palatino Linotype", serif;
+  font-family: "Avenir Next", "Segoe UI Variable", "Helvetica Neue", sans-serif;
 }
 
 .sidebar-kicker {
@@ -285,8 +296,8 @@ button {
   justify-content: center;
   padding: 0.18rem 0.45rem;
   border-radius: 999px;
-  background: rgba(226, 232, 240, 0.08);
-  color: rgba(191, 219, 254, 0.95);
+  background: rgba(56, 189, 248, 0.12);
+  color: rgba(186, 230, 253, 0.98);
   font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.06em;
@@ -304,8 +315,8 @@ button {
   gap: 1rem;
   align-items: start;
   background:
-    radial-gradient(circle at top right, rgba(14, 116, 144, 0.16), transparent 32%),
-    linear-gradient(145deg, rgba(255, 255, 255, 0.84), rgba(244, 239, 228, 0.95));
+    radial-gradient(circle at top right, rgba(2, 132, 199, 0.16), transparent 34%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.78), rgba(243, 248, 255, 0.92));
 }
 
 .hero-badge,
@@ -316,10 +327,10 @@ button {
   align-items: center;
   padding: 0.32rem 0.7rem;
   border-radius: 999px;
-  background: rgba(15, 118, 110, 0.12);
+  background: rgba(2, 132, 199, 0.1);
   color: var(--accent-strong);
   font-size: 0.84rem;
-  border: 1px solid rgba(15, 118, 110, 0.14);
+  border: 1px solid rgba(2, 132, 199, 0.12);
 }
 
 .hero-badge.warning,
@@ -331,9 +342,9 @@ button {
 }
 
 .hero-badge.lesson {
-  background: rgba(22, 78, 99, 0.12);
-  border-color: rgba(22, 78, 99, 0.18);
-  color: #0f4c5c;
+  background: rgba(14, 165, 233, 0.12);
+  border-color: rgba(14, 165, 233, 0.16);
+  color: #075985;
 }
 
 .hero-badge.danger,
@@ -366,7 +377,13 @@ button {
   padding: 1.1rem;
   position: relative;
   overflow: hidden;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.8), rgba(247, 244, 236, 0.94));
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(250, 252, 255, 0.9));
+  backdrop-filter: blur(18px);
+  transition: transform 140ms ease, box-shadow 140ms ease;
+}
+
+.card:hover {
+  transform: translateY(-1px);
 }
 
 .card::before {
@@ -375,7 +392,7 @@ button {
   inset: 0 auto auto 0;
   width: 100%;
   height: 4px;
-  background: linear-gradient(90deg, rgba(15, 118, 110, 0.6), rgba(180, 83, 9, 0.45));
+  background: linear-gradient(90deg, rgba(14, 165, 233, 0.72), rgba(2, 132, 199, 0.4));
 }
 
 .card p,
@@ -403,7 +420,7 @@ button {
   padding: 1rem;
   border-radius: 20px;
   border: 1px solid rgba(14, 32, 56, 0.1);
-  background: linear-gradient(160deg, rgba(15, 23, 42, 0.95), rgba(22, 78, 99, 0.88));
+  background: linear-gradient(160deg, rgba(15, 23, 42, 0.96), rgba(3, 105, 161, 0.9));
   color: #f8fafc;
   box-shadow: 0 16px 34px rgba(11, 21, 37, 0.18);
 }
@@ -415,7 +432,7 @@ button {
 
 .curriculum-step {
   margin: 0 0 0.6rem;
-  color: rgba(125, 211, 252, 0.9);
+  color: rgba(186, 230, 253, 0.92);
   font-size: 0.78rem;
   font-weight: 700;
   letter-spacing: 0.16em;
@@ -448,8 +465,8 @@ button {
   margin: 0;
   padding: 1rem;
   border-radius: 16px;
-  background: #1d1a16;
-  color: #f7f0e1;
+  background: #0f172a;
+  color: #e2e8f0;
   font-size: 0.88rem;
   line-height: 1.5;
   overflow: auto;
@@ -498,7 +515,7 @@ select:focus,
 textarea:focus,
 button:focus,
 a:focus {
-  outline: 3px solid rgba(15, 118, 110, 0.2);
+  outline: 3px solid rgba(14, 165, 233, 0.2);
   outline-offset: 2px;
 }
 
@@ -536,14 +553,14 @@ th button {
   padding: 0.95rem;
   border-radius: 18px;
   border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.64);
+  background: rgba(255, 255, 255, 0.72);
 }
 
 .metric strong {
   display: block;
   margin-top: 0.25rem;
   font-size: 1.5rem;
-  font-family: "Iowan Old Style", "Book Antiqua", "Palatino Linotype", serif;
+  font-family: "Avenir Next", "Segoe UI Variable", "Helvetica Neue", sans-serif;
   color: var(--text);
 }
 
@@ -557,8 +574,8 @@ th button {
 .lazy-grid figure,
 .drag-target {
   border-radius: 18px;
-  border: 1px dashed rgba(20, 32, 51, 0.2);
-  background: rgba(255, 255, 255, 0.62);
+  border: 1px dashed rgba(51, 65, 85, 0.18);
+  background: rgba(255, 255, 255, 0.66);
 }
 
 .notice,
@@ -570,7 +587,7 @@ th button {
   display: inline-flex;
   padding: 0.8rem 1rem;
   border-radius: 14px;
-  background: rgba(15, 118, 110, 0.12);
+  background: rgba(2, 132, 199, 0.12);
   color: var(--accent-strong);
   cursor: grab;
 }
@@ -630,8 +647,8 @@ th button {
   max-width: 320px;
   padding: 0.88rem 1rem;
   border-radius: 18px;
-  background: rgba(34, 27, 18, 0.95);
-  color: #fef8ee;
+  background: rgba(15, 23, 42, 0.96);
+  color: #eff6ff;
   box-shadow: var(--shadow);
 }
 
@@ -643,7 +660,7 @@ th button {
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(31, 22, 12, 0.42);
+  background: rgba(15, 23, 42, 0.42);
   display: grid;
   place-items: center;
   padding: 1rem;
@@ -695,7 +712,7 @@ th button {
 }
 
 .custom-menu button:hover {
-  background: rgba(15, 118, 110, 0.1);
+  background: rgba(2, 132, 199, 0.1);
 }
 
 .iframe-shell,
@@ -724,7 +741,7 @@ iframe {
   object-fit: cover;
   border-radius: 14px;
   display: block;
-  background: rgba(15, 118, 110, 0.08);
+  background: rgba(2, 132, 199, 0.08);
 }
 
 .menu-shell ul {

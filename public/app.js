@@ -169,6 +169,70 @@ const TRAINING_MODULES = [
   }
 ];
 
+const MICRO_LESSON_GUIDES = {
+  "/basic-elements": {
+    title: "Teach This Page As 4 Short Lessons",
+    description: "Keep this route intact, but record it as four small videos so each automation pattern stays clear.",
+    lessons: [
+      { label: "Lesson 1", title: "Text and password inputs", focus: "Locate fields, fill values, and assert submitted payloads." },
+      { label: "Lesson 2", title: "Email, number, and URL fields", focus: "Show input typing rules and validation-friendly selectors." },
+      { label: "Lesson 3", title: "Textarea and reset behavior", focus: "Capture form state, submit, then prove reset restores defaults." },
+      { label: "Lesson 4", title: "Disabled and readonly fields", focus: "Explain negative assertions and why non-editable fields matter in automation." }
+    ]
+  },
+  "/selection-controls": {
+    title: "Teach This Page As 4 Short Lessons",
+    description: "This page works best as a progression from static selection controls into async-loaded controls.",
+    lessons: [
+      { label: "Lesson 1", title: "Checkboxes", focus: "Teach checked state, multiple selection, and list assertions." },
+      { label: "Lesson 2", title: "Radio buttons", focus: "Teach single-choice behavior and exact-value assertions." },
+      { label: "Lesson 3", title: "Single and multi-select", focus: "Show option selection, selected text, and multiple values." },
+      { label: "Lesson 4", title: "Dynamic dropdown", focus: "Introduce waiting, enabling, and async option loading." }
+    ]
+  },
+  "/buttons": {
+    title: "Teach This Page As 6 Short Lessons",
+    description: "Do not teach all button types together. Use one short video per interaction pattern, then come back for a recap.",
+    lessons: [
+      { label: "Lesson 1", title: "Standard click", focus: "Start with the simplest action and a clean click assertion." },
+      { label: "Lesson 2", title: "Double click", focus: "Introduce action variation without changing the selector strategy." },
+      { label: "Lesson 3", title: "Long press", focus: "Teach timing-sensitive actions and wait strategy." },
+      { label: "Lesson 4", title: "Hover reveal", focus: "Show hidden-state interactions and visibility assertions." },
+      { label: "Lesson 5", title: "Right-click context menu", focus: "Teach context click and follow-up menu assertions." },
+      { label: "Lesson 6", title: "Add and remove elements", focus: "Close with dynamic DOM updates and resilient locator habits." }
+    ]
+  },
+  "/dialogs": {
+    title: "Teach This Page As 5 Short Lessons",
+    description: "Dialogs mix multiple automation APIs, so shorter focused lessons are easier for students to digest.",
+    lessons: [
+      { label: "Lesson 1", title: "Alert", focus: "Handle the simplest browser dialog first." },
+      { label: "Lesson 2", title: "Confirm", focus: "Add accept/cancel branching and assertion patterns." },
+      { label: "Lesson 3", title: "Prompt", focus: "Teach dialog input handling." },
+      { label: "Lesson 4", title: "Modal and nested modal", focus: "Shift from browser-native dialogs to DOM-based modal automation." },
+      { label: "Lesson 5", title: "Toast, entry, and exit modals", focus: "Finish with transient messaging and behavioral overlays." }
+    ]
+  },
+  "/forms/login": {
+    title: "Teach This Page As 3 Short Lessons",
+    description: "Once UI basics are done, this route becomes a natural jump into realistic business flows.",
+    lessons: [
+      { label: "Lesson 1", title: "Happy-path login", focus: "Fill fields, submit, and assert success state." },
+      { label: "Lesson 2", title: "Invalid credentials", focus: "Introduce negative-path coverage and message assertions." },
+      { label: "Lesson 3", title: "Protected-flow thinking", focus: "Connect the login page to auth gates and session behavior." }
+    ]
+  },
+  "/forms/register": {
+    title: "Teach This Page As 3 Short Lessons",
+    description: "This page is best used for validation-focused videos rather than one long walkthrough.",
+    lessons: [
+      { label: "Lesson 1", title: "Field completion", focus: "Show how to automate a clean valid submission." },
+      { label: "Lesson 2", title: "Password confirmation", focus: "Teach mismatch validation and negative assertions." },
+      { label: "Lesson 3", title: "Form-quality mindset", focus: "Explain why registration pages are rich validation targets." }
+    ]
+  }
+};
+
 const CLIENT_ID_STORAGE_KEY = `${STORAGE_KEY}-client-id`;
 
 function loadState() {
@@ -441,6 +505,33 @@ function getLessonContext(path) {
   };
 }
 
+function renderMicroLessonGuide(path) {
+  const guide = MICRO_LESSON_GUIDES[path];
+  if (!guide) {
+    return "";
+  }
+
+  return card(
+    guide.title,
+    guide.description,
+    `
+      <div class="micro-lesson-grid">
+        ${guide.lessons
+          .map(
+            (lesson) => `
+              <article class="micro-lesson-card">
+                <p class="micro-lesson-kicker">${escapeHtml(lesson.label)}</p>
+                <h4>${escapeHtml(lesson.title)}</h4>
+                <p>${escapeHtml(lesson.focus)}</p>
+              </article>
+            `
+          )
+          .join("")}
+      </div>
+    `
+  );
+}
+
 function secureDownloadsUnlocked() {
   return state.auth.sessionLoggedIn || state.auth.basicGranted || state.auth.digestGranted;
 }
@@ -649,6 +740,7 @@ function renderBasicElements() {
   const notesId = dynamicId("basic-notes");
 
   return `
+    ${renderMicroLessonGuide("/basic-elements")}
     ${card(
       "Inputs and Standard Controls",
       "Submit writes values to the result panel. Reset restores the seeded defaults.",
@@ -728,6 +820,7 @@ function renderSelectionControls() {
     : `<option value="">Load options first</option>`;
 
   return `
+    ${renderMicroLessonGuide("/selection-controls")}
     ${card(
       "Checkboxes, Radios, and Dropdowns",
       "Includes a delayed dropdown to simulate async option loading.",
@@ -784,6 +877,7 @@ function renderButtons() {
   const clones = Array.from({ length: state.counters.buttonListCount }, (_, index) => index + 1);
 
   return `
+    ${renderMicroLessonGuide("/buttons")}
     <div class="component-grid">
       ${card(
         "Primary Click Targets",
@@ -827,6 +921,7 @@ function renderButtons() {
 
 function renderDialogs() {
   return `
+    ${renderMicroLessonGuide("/dialogs")}
     <div class="component-grid">
       ${card(
         "Native Dialogs",
@@ -858,6 +953,7 @@ function renderDialogs() {
 
 function renderLoginForm() {
   return `
+    ${renderMicroLessonGuide("/forms/login")}
     ${card(
       "Login Scenario",
       "Try valid and invalid credentials to exercise success and failure states.",
@@ -883,6 +979,7 @@ function renderLoginForm() {
 
 function renderRegisterForm() {
   return `
+    ${renderMicroLessonGuide("/forms/register")}
     ${card(
       "Register Scenario",
       "Validation enforces username uniqueness, password strength, and password confirmation.",

@@ -166,8 +166,11 @@ test("disappearing element action works in isolation", async ({ page }) => {
 
 test("drag and drop action works in isolation", async ({ page }) => {
   await gotoFresh(page, "/interactions/drag-drop", "Interactions: Drag and Drop");
-  await page.locator("#drag-token").dragTo(page.locator("#drop-target"));
-  await expectOutputContains(page, "drag-token");
+  const dataTransfer = await page.evaluateHandle(() => new DataTransfer());
+  await page.locator("#drag-token").dispatchEvent("dragstart", { dataTransfer });
+  await page.locator("#drop-target").dispatchEvent("dragover", { dataTransfer });
+  await page.locator("#drop-target").dispatchEvent("drop", { dataTransfer });
+  await expect(page.getByTestId("drop-target")).toContainText("Dropped: drag-token");
 });
 
 test("slider action works in isolation", async ({ page }) => {

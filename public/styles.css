@@ -438,6 +438,39 @@ button {
   letter-spacing: 0.16em;
 }
 
+.micro-lesson-grid {
+  display: grid;
+  gap: 0.9rem;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.micro-lesson-card {
+  padding: 0.95rem;
+  border-radius: 20px;
+  border: 1px solid rgba(2, 132, 199, 0.12);
+  background: linear-gradient(180deg, rgba(240, 249, 255, 0.9), rgba(255, 255, 255, 0.78));
+}
+
+.micro-lesson-card h4 {
+  margin: 0 0 0.35rem;
+  font-size: 1rem;
+  color: var(--text);
+}
+
+.micro-lesson-card p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.micro-lesson-kicker {
+  margin: 0 0 0.35rem;
+  color: var(--accent-strong);
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
 .card-description {
   margin: 0 0 0.9rem;
 }

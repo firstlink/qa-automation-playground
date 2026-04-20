@@ -225,6 +225,30 @@ test("api fetch action works in isolation", async ({ page }) => {
   await expectOutputContains(page, '"generatedAt"');
 });
 
+test("accessibility checklist action works in isolation", async ({ page }) => {
+  await gotoFresh(page, "/accessibility", "Quality: Accessibility");
+  await page.getByRole("button", { name: "Run trainer checklist" }).click();
+  await expectOutputContains(page, '"labels": "pass"');
+});
+
+test("responsiveness snapshot action works in isolation", async ({ page }) => {
+  await gotoFresh(page, "/responsiveness", "Quality: Responsiveness");
+  await page.getByRole("button", { name: "Measure current viewport" }).click();
+  await expectOutputContains(page, '"breakpoint"');
+});
+
+test("performance snapshot action works in isolation", async ({ page }) => {
+  await gotoFresh(page, "/performance", "Quality: Performance");
+  await page.getByRole("button", { name: "Capture performance snapshot" }).click();
+  await expectOutputContains(page, '"resourceCount"');
+});
+
+test("reporting checklist action works in isolation", async ({ page }) => {
+  await gotoFresh(page, "/reports", "Quality: Reporting");
+  await page.getByRole("button", { name: "Show reporting checklist" }).click();
+  await expectOutputContains(page, 'npm run allure:generate');
+});
+
 test("shop login action works in isolation", async ({ page }) => {
   await gotoFresh(page, "/shop/login", "Shop: Login");
   await page.getByRole("button", { name: "Enter shop" }).click();

@@ -42,6 +42,10 @@ const routes = [
   ["/scrolling/lazy-images", "Scrolling: Lazy Images"],
   ["/scrolling/floating-menu", "Scrolling: Floating Menu"],
   ["/api-ui", "API UI"],
+  ["/accessibility", "Quality: Accessibility"],
+  ["/responsiveness", "Quality: Responsiveness"],
+  ["/performance", "Quality: Performance"],
+  ["/reports", "Quality: Reporting"],
   ["/flaky/delayed-button", "Flaky: Delayed Button"],
   ["/flaky/race-condition", "Flaky: Race Condition"],
   ["/flaky/re-render", "Flaky: Re-render DOM"],
@@ -75,6 +79,8 @@ test("sidebar navigation reaches major destination pages", async ({ page }) => {
   await expect(page.locator("#page-title")).toHaveText("Basic Elements");
   await page.getByTestId("nav--api-ui").click();
   await expect(page.locator("#page-title")).toHaveText("API UI");
+  await page.getByTestId("nav--reports").click();
+  await expect(page.locator("#page-title")).toHaveText("Quality: Reporting");
   await page.getByTestId("top-coverage-link").click();
   await expect(page.locator("#page-title")).toHaveText("Coverage Index");
 });

@@ -2,24 +2,19 @@ import http from "node:http";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import {
+  createDefaultState,
+  createSeedSnapshot,
+  normalizeState,
+  resetState
+} from "./public/app-state.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const publicDir = path.join(__dirname, "public");
 const port = Number(process.env.PORT || 4173);
-const host = process.env.HOST || "127.0.0.1";
-
-const seedPayload = {
-  users: [{ username: "student", password: "Password123!" }],
-  products: [
-    { id: 1, name: "Laptop", price: 999 },
-    { id: 2, name: "Phone", price: 599 },
-    { id: 3, name: "Headphones", price: 149 },
-    { id: 4, name: "Monitor", price: 329 }
-  ],
-  orders: [],
-  notifications: ["Welcome!", "Order placed successfully"]
-};
+const host = process.env.HOST || "0.0.0.0";
+const stateByClient = new Map();
 
 const mimeTypes = {
   ".css": "text/css; charset=utf-8",
@@ -50,6 +45,59 @@ function getBody(req) {
   });
 }
 
+async function getJsonBody(req) {
+  const rawBody = await getBody(req);
+  if (!rawBody) {
+    return {};
+  }
+
+  try {
+    return JSON.parse(rawBody);
+  } catch {
+    return {};
+  }
+}
+
+function parseCookies(cookieHeader = "") {
+  return cookieHeader
+    .split(";")
+    .map((part) => part.trim())
+    .filter(Boolean)
+    .reduce((cookies, entry) => {
+      const separator = entry.indexOf("=");
+      if (separator === -1) {
+        return cookies;
+      }
+      const key = entry.slice(0, separator);
+      const value = entry.slice(separator + 1);
+      cookies[key] = decodeURIComponent(value);
+      return cookies;
+    }, {});
+}
+
+function resolveClientId(req, parsedBody = null) {
+  const cookies = parseCookies(req.headers.cookie);
+  return (
+    req.headers["x-qa-playground-client"] ||
+    parsedBody?.clientId ||
+    cookies.qa_playground_client ||
+    "anonymous"
+  );
+}
+
+function getClientState(clientId) {
+  if (!stateByClient.has(clientId)) {
+    stateByClient.set(clientId, createDefaultState());
+  }
+  return stateByClient.get(clientId);
+}
+
+function setClientState(clientId, nextState) {
+  const normalized = normalizeState(nextState);
+  stateByClient.set(clientId, normalized);
+  return normalized;
+}
+
 async function serveFile(res, filePath, headers = {}) {
   try {
     const content = await readFile(filePath);
@@ -71,14 +119,35 @@ const server = http.createServer(async (req, res) => {
   const pathname = requestUrl.pathname;
 
   if (pathname === "/api/seed" && req.method === "GET") {
+    const clientId = resolveClientId(req);
+    const snapshot = createSeedSnapshot(getClientState(clientId));
     return sendJson(res, 200, {
-      ...seedPayload,
+      ...snapshot,
       generatedAt: new Date().toISOString()
     });
   }
 
+  if (pathname === "/api/state" && req.method === "GET") {
+    const clientId = resolveClientId(req);
+    return sendJson(res, 200, getClientState(clientId));
+  }
+
+  if (pathname === "/api/state" && req.method === "POST") {
+    const parsed = await getJsonBody(req);
+    const clientId = resolveClientId(req, parsed);
+    const current = getClientState(clientId);
+    const nextState = parsed.state ? parsed.state : current;
+    const state = setClientState(clientId, nextState);
+    return sendJson(res, 200, {
+      ok: true,
+      reason: parsed.reason || "sync",
+      state
+    });
+  }
+
   if (pathname === "/api/notifications" && req.method === "GET") {
-    return sendJson(res, 200, seedPayload.notifications);
+    const clientId = resolveClientId(req);
+    return sendJson(res, 200, getClientState(clientId).notifications);
   }
 
   if (pathname === "/api/status/404" && req.method === "GET") {
@@ -90,17 +159,35 @@ const server = http.createServer(async (req, res) => {
   }
 
   if (pathname === "/api/mutate" && req.method === "POST") {
-    const rawBody = await getBody(req);
-    const parsed = rawBody ? JSON.parse(rawBody) : {};
+    const parsed = await getJsonBody(req);
+    const clientId = resolveClientId(req, parsed);
+    const appState = getClientState(clientId);
+    appState.logs = [
+      {
+        at: new Date().toISOString(),
+        route: parsed.route || "/api/mutate",
+        title: `Mutation recorded for ${parsed.action || "unknown-action"}`,
+        details: parsed
+      },
+      ...appState.logs
+    ].slice(0, 24);
+
     return sendJson(res, 200, {
       ok: true,
       message: `Mutation recorded for ${parsed.action || "unknown-action"}`,
-      received: parsed
+      received: parsed,
+      admin: appState.admin
     });
   }
 
   if (pathname === "/api/reset" && req.method === "POST") {
-    return sendJson(res, 200, { ok: true, message: "Server-side reset acknowledged" });
+    const clientId = resolveClientId(req);
+    const appState = setClientState(clientId, resetState(getClientState(clientId)));
+    return sendJson(res, 200, {
+      ok: true,
+      message: "Server-side reset acknowledged",
+      state: appState
+    });
   }
 
   if (pathname === "/redirect-demo" && req.method === "GET") {

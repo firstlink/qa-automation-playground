@@ -311,6 +311,42 @@ const routeSpecs = [
     }
   },
   {
+    name: "accessibility lab renders independently",
+    path: "/accessibility",
+    heading: "Quality: Accessibility",
+    assert: async (page) => {
+      await expect(page.getByRole("button", { name: "Run trainer checklist" })).toBeVisible();
+      await expect(page.locator(".plain-list")).toContainText("keyboard order");
+    }
+  },
+  {
+    name: "responsiveness lab renders independently",
+    path: "/responsiveness",
+    heading: "Quality: Responsiveness",
+    assert: async (page) => {
+      await expect(page.getByRole("button", { name: "Measure current viewport" })).toBeVisible();
+      await expect(page.locator(".metric-grid")).toContainText("Desktop");
+    }
+  },
+  {
+    name: "performance lab renders independently",
+    path: "/performance",
+    heading: "Quality: Performance",
+    assert: async (page) => {
+      await expect(page.getByRole("button", { name: "Capture performance snapshot" })).toBeVisible();
+      await expect(page.locator(".plain-list")).toContainText("slow-network toggle");
+    }
+  },
+  {
+    name: "reports lab renders independently",
+    path: "/reports",
+    heading: "Quality: Reporting",
+    assert: async (page) => {
+      await expect(page.locator(".code-block")).toContainText("npm run allure:generate");
+      await expect(page.getByRole("button", { name: "Show reporting checklist" })).toBeVisible();
+    }
+  },
+  {
     name: "delayed button renders independently",
     path: "/flaky/delayed-button",
     heading: "Flaky: Delayed Button",

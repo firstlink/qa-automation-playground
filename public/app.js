@@ -1,16 +1,14 @@
-const SEED_DATA = {
-  users: [{ username: "student", password: "Password123!" }],
-  products: [
-    { id: 1, name: "Laptop", price: 999, stock: 6 },
-    { id: 2, name: "Phone", price: 599, stock: 11 },
-    { id: 3, name: "Headphones", price: 149, stock: 18 },
-    { id: 4, name: "Monitor", price: 329, stock: 8 }
-  ],
-  orders: [],
-  notifications: ["Welcome!", "Order placed successfully"]
-};
-
-const STORAGE_KEY = "qa-automation-playground-state-v1";
+import {
+  STORAGE_KEY,
+  clone,
+  createDefaultState,
+  createSeedSnapshot,
+  dynamicId as sharedDynamicId,
+  hashText as sharedHashText,
+  normalizeState,
+  randomUnit as sharedRandomUnit,
+  scenarioDelayMs as sharedScenarioDelayMs
+} from "./app-state.js";
 
 const AUDIT_ROWS = Array.from({ length: 18 }, (_, index) => ({
   id: index + 1,
@@ -85,131 +83,87 @@ const NAV_GROUP_ORDER = [
   "Status"
 ];
 
-function clone(value) {
-  return JSON.parse(JSON.stringify(value));
-}
+const TRAINING_MODULES = [
+  {
+    id: "orientation",
+    title: "Module 1 · Orientation",
+    note: "Introduce the playground, reset state, and show learners how results and debug panels work.",
+    paths: ["/", "/admin"]
+  },
+  {
+    id: "forms-auth",
+    title: "Module 2 · Forms And Authentication",
+    note: "Start with the patterns beginners meet first: login, validation, and protected pages.",
+    paths: ["/forms/login", "/forms/register", "/forms/forgot-password", "/auth/basic", "/auth/digest", "/auth/session", "/auth/protected"]
+  },
+  {
+    id: "selenium-fundamentals",
+    title: "Module 3 · Selenium UI Fundamentals",
+    note: "Walk through controls one by one: inputs, dropdowns, buttons, dialogs, frames, windows, and tables.",
+    paths: [
+      "/basic-elements",
+      "/selection-controls",
+      "/buttons",
+      "/dialogs",
+      "/frames/editor",
+      "/frames/nested",
+      "/windows",
+      "/tables/static",
+      "/tables/sortable",
+      "/tables/paginated",
+      "/tables/editable",
+      "/keyboard"
+    ]
+  },
+  {
+    id: "advanced-ui",
+    title: "Module 4 · Advanced UI And Dynamic States",
+    note: "Move from basic components into hover, drag-and-drop, scrolling, dynamic DOM behavior, and tougher locators.",
+    paths: [
+      "/interactions/hover",
+      "/interactions/drag-drop",
+      "/interactions/slider",
+      "/interactions/menu",
+      "/dynamic/loading",
+      "/dynamic/content",
+      "/dynamic/delayed-content",
+      "/dynamic/controls",
+      "/dynamic/disappearing",
+      "/scrolling/infinite",
+      "/scrolling/lazy-images",
+      "/scrolling/floating-menu",
+      "/advanced-locators",
+      "/advanced-locators/challenging-dom",
+      "/advanced-locators/shifting-content",
+      "/ab-testing",
+      "/flaky/delayed-button",
+      "/flaky/race-condition",
+      "/flaky/re-render",
+      "/flaky/random-toast",
+      "/flaky/typos"
+    ]
+  },
+  {
+    id: "data-validation",
+    title: "Module 5 · Data, Files And Validation",
+    note: "Cover upload/download, notifications, status handling, and observable feedback loops for assertions.",
+    paths: ["/files/upload", "/files/download", "/files/secure-download", "/status", "/page-events", "/page-events/notifications", "/page-events/onload-error"]
+  },
+  {
+    id: "quality-engineering",
+    title: "Module 6 · API, Accessibility And Performance",
+    note: "Pivot from UI automation to broader quality engineering topics: API checks, accessibility, responsiveness, and reporting.",
+    paths: ["/api-ui", "/accessibility", "/responsiveness", "/performance", "/reports", "/geolocation"]
+  },
+  {
+    id: "capstone",
+    title: "Module 7 · Capstone Shop Flow",
+    note: "Finish with a realistic business flow that ties together auth, product selection, checkout, confirmation, and reporting.",
+    paths: ["/shop/login", "/shop/products", "/shop/cart", "/shop/checkout", "/shop/confirmation", "/coverage-index"]
+  }
+];
 
-function createEditableRows() {
-  return SEED_DATA.products.map((product) => ({
-    id: product.id,
-    name: product.name,
-    owner: product.id % 2 === 0 ? "Automation Pod" : "QA Guild",
-    status: product.id % 2 === 0 ? "Ready" : "Draft",
-    quantity: product.stock
-  }));
-}
-
-function createDefaultState() {
-  return {
-    admin: {
-      stableMode: true,
-      flakyMode: false,
-      slowNetwork: false,
-      dynamicIds: false
-    },
-    auth: {
-      basicGranted: false,
-      digestGranted: false,
-      sessionLoggedIn: false,
-      shopLoggedIn: false
-    },
-    users: clone(SEED_DATA.users),
-    products: clone(SEED_DATA.products),
-    orders: clone(SEED_DATA.orders),
-    notifications: clone(SEED_DATA.notifications),
-    cart: [],
-    logs: [],
-    navHistory: [],
-    output: {
-      route: "/",
-      title: "Ready",
-      payload: {
-        message: "Interact with a scenario to populate the result panel."
-      }
-    },
-    counters: {
-      interactions: 0,
-      buttonListCount: 2,
-      clickCount: 0,
-      doubleClickCount: 0,
-      longPressCount: 0,
-      rerenderVersion: 1
-    },
-    tables: {
-      sortKey: "id",
-      sortDirection: "asc",
-      page: 1,
-      editableRows: createEditableRows()
-    },
-    dynamic: {
-      optionsLoaded: false,
-      spinnerLoaded: false,
-      contentVersion: 1,
-      delayedVisible: false,
-      controlsEnabled: false,
-      disappearingVisible: true,
-      disappearingArmed: false
-    },
-    ui: {
-      activeModal: null,
-      nestedModal: false,
-      entryModalSeen: false,
-      exitModalSeen: false,
-      toasts: [],
-      customMenu: null,
-      lastApiResponse: null,
-      apiError: null,
-      delayedButtonReady: false,
-      delayedButtonDelay: null,
-      raceResult: null,
-      scrollingCount: 12,
-      geo: null,
-      abVariant: "A",
-      notificationIndex: 0,
-      shiftingContentOffset: false,
-      onloadErrorCaptured: false
-    },
-    shop: {
-      lastOrderId: null
-    },
-    seed: 20260416
-  };
-}
-
-function normalizeState(candidate) {
-  const defaults = createDefaultState();
-  const state = candidate && typeof candidate === "object" ? candidate : {};
-
-  return {
-    ...defaults,
-    ...state,
-    admin: { ...defaults.admin, ...(state.admin || {}) },
-    auth: { ...defaults.auth, ...(state.auth || {}) },
-    counters: { ...defaults.counters, ...(state.counters || {}) },
-    tables: {
-      ...defaults.tables,
-      ...(state.tables || {}),
-      editableRows: Array.isArray(state.tables?.editableRows)
-        ? state.tables.editableRows
-        : defaults.tables.editableRows
-    },
-    dynamic: { ...defaults.dynamic, ...(state.dynamic || {}) },
-    ui: {
-      ...defaults.ui,
-      ...(state.ui || {}),
-      toasts: Array.isArray(state.ui?.toasts) ? state.ui.toasts : defaults.ui.toasts
-    },
-    shop: { ...defaults.shop, ...(state.shop || {}) },
-    users: Array.isArray(state.users) ? state.users : defaults.users,
-    products: Array.isArray(state.products) ? state.products : defaults.products,
-    orders: Array.isArray(state.orders) ? state.orders : defaults.orders,
-    notifications: Array.isArray(state.notifications) ? state.notifications : defaults.notifications,
-    cart: Array.isArray(state.cart) ? state.cart : defaults.cart,
-    logs: Array.isArray(state.logs) ? state.logs : defaults.logs,
-    navHistory: Array.isArray(state.navHistory) ? state.navHistory : defaults.navHistory,
-    output: state.output || defaults.output
-  };
-}
+const CLIENT_ID_STORAGE_KEY = `${STORAGE_KEY}-client-id`;
 
 function loadState() {
   try {
@@ -225,7 +179,8 @@ const cleanupFns = [];
 const runtime = {
   longPressTimer: null,
   lazyObserver: null,
-  currentRouteKey: null
+  currentRouteKey: null,
+  syncTimer: null
 };
 
 const refs = {
@@ -242,8 +197,51 @@ const refs = {
   modalRoot: document.getElementById("modal-root")
 };
 
-function saveState() {
+function ensureClientId() {
+  const existing = localStorage.getItem(CLIENT_ID_STORAGE_KEY);
+  if (existing) {
+    document.cookie = `qa_playground_client=${existing}; path=/; SameSite=Lax`;
+    return existing;
+  }
+
+  const generated =
+    globalThis.crypto?.randomUUID?.() ||
+    `qa-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+
+  localStorage.setItem(CLIENT_ID_STORAGE_KEY, generated);
+  document.cookie = `qa_playground_client=${generated}; path=/; SameSite=Lax`;
+  return generated;
+}
+
+const clientId = ensureClientId();
+
+scheduleSharedStateSync("bootstrap");
+
+function scheduleSharedStateSync(reason = "save-state") {
+  if (runtime.syncTimer) {
+    window.clearTimeout(runtime.syncTimer);
+  }
+
+  runtime.syncTimer = window.setTimeout(() => {
+    runtime.syncTimer = null;
+    fetch("/api/state", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-qa-playground-client": clientId
+      },
+      body: JSON.stringify({
+        clientId,
+        reason,
+        state: normalizeState(state)
+      })
+    }).catch(() => {});
+  }, 0);
+}
+
+function saveState(reason = "save-state") {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  scheduleSharedStateSync(reason);
 }
 
 function escapeHtml(value) {
@@ -269,27 +267,15 @@ function getCurrentPath() {
 }
 
 function hashText(input) {
-  let hash = 2166136261;
-  for (let index = 0; index < input.length; index += 1) {
-    hash ^= input.charCodeAt(index);
-    hash = Math.imul(hash, 16777619);
-  }
-  return hash >>> 0;
+  return sharedHashText(input);
 }
 
 function randomUnit(label) {
-  return hashText(`${state.seed}:${state.counters.interactions}:${label}`) / 4294967295;
+  return sharedRandomUnit(state, label);
 }
 
 function scenarioDelayMs(label, base = 250, spread = 700) {
-  let delay = base;
-  if (state.admin.flakyMode) {
-    delay = Math.round(base + randomUnit(label) * spread);
-  }
-  if (state.admin.slowNetwork) {
-    delay += 900;
-  }
-  return delay;
+  return sharedScenarioDelayMs(state, label, base, spread);
 }
 
 function sleep(ms) {
@@ -297,10 +283,7 @@ function sleep(ms) {
 }
 
 function dynamicId(base) {
-  if (!state.admin.dynamicIds) {
-    return base;
-  }
-  return `${base}-${hashText(`${base}:${state.counters.interactions}`).toString(36).slice(0, 5)}`;
+  return sharedDynamicId(state, base);
 }
 
 function routeButton(path, label, style = "secondary") {
@@ -435,6 +418,23 @@ function rememberNavigation(path) {
   }
 }
 
+function getTrainingModule(path) {
+  return TRAINING_MODULES.find((module) => module.paths.includes(path)) || null;
+}
+
+function getLessonContext(path) {
+  const module = getTrainingModule(path);
+  if (!module) {
+    return null;
+  }
+  const index = module.paths.indexOf(path);
+  return {
+    module,
+    index: index + 1,
+    total: module.paths.length
+  };
+}
+
 function secureDownloadsUnlocked() {
   return state.auth.sessionLoggedIn || state.auth.basicGranted || state.auth.digestGranted;
 }
@@ -454,34 +454,42 @@ function sectionIndexRoute(route) {
 }
 
 function renderHome() {
+  const curriculumCards = TRAINING_MODULES.map(
+    (module, index) => `
+      <article class="curriculum-card">
+        <p class="curriculum-step">${String(index + 1).padStart(2, "0")}</p>
+        <h3>${escapeHtml(module.title)}</h3>
+        <p>${escapeHtml(module.note)}</p>
+        <div class="button-row">
+          ${routeButton(module.paths[0], index === 0 ? "Open Orientation" : "Start Module", index === 0 ? "primary" : "secondary")}
+          ${module.paths[1] ? routeButton(module.paths[1], "Next Lesson") : ""}
+        </div>
+      </article>
+    `
+  ).join("");
+
   return `
     ${card(
-      "Mission Control",
-      "Use this sandbox to demo selectors, async behavior, resilient automation, and flaky workflows.",
+      "Trainer Mission Control",
+      "Teach Selenium and quality engineering as a guided journey instead of a flat list of demos.",
       `
         ${metrics([
-          { label: "Routes", value: String(ROUTES.filter((route) => route.nav !== false).length), note: "Navigation-ready pages" },
-          { label: "Products", value: String(state.products.length), note: "Seeded shop inventory" },
-          { label: "Orders", value: String(state.orders.length), note: "Captured checkout confirmations" },
-          { label: "Cart Items", value: String(cartItemCount()), note: "Persisted in local storage" }
+          { label: "Modules", value: String(TRAINING_MODULES.length), note: "Trainer-led teaching blocks" },
+          { label: "Lessons", value: String(TRAINING_MODULES.reduce((sum, module) => sum + module.paths.length, 0)), note: "Ordered practice stops" },
+          { label: "Capstone Flow", value: "Shop", note: "Realistic end-to-end exercise" },
+          { label: "Verification", value: "Playwright + Allure", note: "Execution and reporting are ready" }
         ])}
       `
     )}
     <div class="component-grid">
       ${card(
-        "Quick Start",
-        "Jump into the main scenarios learners usually start with.",
-        linkList([
-          { path: "/basic-elements", label: "Basic Elements" },
-          { path: "/forms/login", label: "Login" },
-          { path: "/tables/sortable", label: "Sortable Table" },
-          { path: "/dynamic/loading", label: "Dynamic Loading" },
-          { path: "/shop/products", label: "Shop Flow" }
-        ])
+        "Training Roadmap",
+        "Follow the modules in order so students move from UI basics to broader quality engineering concepts naturally.",
+        `<div class="curriculum-grid">${curriculumCards}</div>`
       )}
       ${card(
-        "Demo Credentials",
-        "These are used across the auth and shop scenarios.",
+        "Trainer Credentials",
+        "Use these seeded credentials whenever you reach auth or capstone scenarios.",
         `
           <div class="notice">
             <p><strong>username:</strong> student</p>
@@ -494,25 +502,25 @@ function renderHome() {
         `
       )}
       ${card(
-        "Observability",
-        "Every scenario writes to the result panel and recent event log to make demos easy to narrate.",
+        "How To Teach The Flow",
+        "This sequence mirrors a classroom rhythm: explain a control, demo it, let students try it, then connect it to a bigger testing concept.",
         `
           <ul class="plain-list">
-            <li>Use the global reset button to restore deterministic defaults.</li>
-            <li>Flip flaky mode in Admin to enable controlled randomness.</li>
-            <li>Turn on dynamic IDs to test resilient locator strategies.</li>
+            <li>Start in Forms and Authentication so students see fast wins and familiar UI patterns.</li>
+            <li>Move to Selenium UI Fundamentals to teach locators, waits, actions, and assertions one component at a time.</li>
+            <li>Then pivot into dynamic content, API, accessibility, responsiveness, performance, and finally reporting.</li>
           </ul>
         `
       )}
       ${card(
-        "Route Families",
-        "Each family mirrors a QA topic from the PRS.",
+        "Quick Teaching Jumps",
+        "Use these shortcuts when you want to demo a concept live without scrolling through the whole curriculum.",
         linkList([
-          { path: "/forms", label: "Forms" },
-          { path: "/tables", label: "Tables" },
-          { path: "/dynamic", label: "Dynamic" },
-          { path: "/interactions", label: "Interactions" },
-          { path: "/flaky", label: "Flaky Lab" }
+          { path: "/basic-elements", label: "Inputs and Forms" },
+          { path: "/selection-controls", label: "Dropdowns and Checkboxes" },
+          { path: "/dialogs", label: "Alerts and Modals" },
+          { path: "/api-ui", label: "API Checks" },
+          { path: "/reports", label: "Reports Module" }
         ])
       )}
     </div>
@@ -558,6 +566,8 @@ function renderABTesting() {
 }
 
 function renderAdmin() {
+  const seedSnapshot = createSeedSnapshot(state);
+
   return `
     ${card(
       "Environment Controls",
@@ -589,9 +599,24 @@ function renderAdmin() {
     )}
     <div class="component-grid">
       ${card(
+        "Shared State",
+        "These values back both the browser routes and the local API endpoints.",
+        `
+          ${metrics([
+            { label: "Seed", value: String(state.seed), note: "Deterministic randomness source" },
+            { label: "Resets", value: String(state.meta.resetCount), note: "Global reset counter" },
+            { label: "Products", value: String(state.products.length), note: "Seeded inventory rows" },
+            { label: "Notifications", value: String(state.notifications.length), note: "Shared async messages" }
+          ])}
+          <p class="status-strip">
+            <span class="status-chip">Last reset: ${escapeHtml(state.meta.lastResetAt || "never")}</span>
+          </p>
+        `
+      )}
+      ${card(
         "Seed Data",
         "Credentials, products, and notifications are restored by reset.",
-        `<pre class="code-block">${escapeHtml(prettyJson(SEED_DATA))}</pre>`
+        `<pre class="code-block">${escapeHtml(prettyJson(seedSnapshot))}</pre>`
       )}
       ${card(
         "Mode Notes",
@@ -1759,6 +1784,140 @@ function renderApiUi() {
   `;
 }
 
+function renderAccessibilityLab() {
+  return `
+    <div class="component-grid">
+      ${card(
+        "Accessibility Training Lab",
+        "Use this page to explain how UI automation intersects with accessibility basics.",
+        `
+          <div data-testid="accessibility-lab-card"></div>
+          ${metrics([
+            { label: "Labels", value: "Covered", note: "Inputs across form routes use labels" },
+            { label: "Keyboard", value: "Covered", note: "Use the keyboard route to demo key events" },
+            { label: "ARIA Live", value: "Covered", note: "Toasts and output panels announce updates" }
+          ])}
+          <div class="button-row">
+            <button class="primary" type="button" data-action="run-accessibility-audit">Run trainer checklist</button>
+            ${routeButton("/forms/login", "Open Labeled Form")}
+            ${routeButton("/keyboard", "Open Keyboard Demo")}
+          </div>
+        `
+      )}
+      ${card(
+        "What To Explain",
+        "Keep it practical: what testers should look for during manual or automated reviews.",
+        `
+          <ul class="plain-list">
+            <li>Can every form field be reached and understood with labels only?</li>
+            <li>Do status changes appear in a way assistive technology can announce?</li>
+            <li>Can the learner move through the page in a logical keyboard order?</li>
+          </ul>
+        `
+      )}
+    </div>
+  `;
+}
+
+function renderResponsivenessLab() {
+  return `
+    <div class="component-grid">
+      ${card(
+        "Responsive Layout Lab",
+        "Frame the lesson around viewport awareness, flexible containers, and mobile-friendly assertions.",
+        `
+          <div data-testid="responsiveness-lab-card"></div>
+          <div class="metric-grid">
+            <div class="metric"><span>Desktop</span><strong>3-column</strong><small>Best for trainer walkthroughs</small></div>
+            <div class="metric"><span>Tablet</span><strong>2-column</strong><small>Great for resizing demos</small></div>
+            <div class="metric"><span>Mobile</span><strong>1-column</strong><small>Sidebar stacks above content</small></div>
+          </div>
+          <div class="button-row">
+            <button class="primary" type="button" data-action="measure-responsive-layout">Measure current viewport</button>
+          </div>
+        `
+      )}
+      ${card(
+        "Trainer Guidance",
+        "Use this module after the Selenium basics, once students understand locators and can reason about layout changes.",
+        `
+          <ul class="plain-list">
+            <li>Resize the app while students observe how navigation and panels reflow.</li>
+            <li>Talk about why brittle pixel-perfect assertions can fail across breakpoints.</li>
+            <li>Connect responsive behavior to visual testing and exploratory QA.</li>
+          </ul>
+        `
+      )}
+    </div>
+  `;
+}
+
+function renderPerformanceLab() {
+  return `
+    <div class="component-grid">
+      ${card(
+        "Performance Coaching Lab",
+        "Use browser timing data and the admin slow-network toggle to explain performance-sensitive automation.",
+        `
+          <div data-testid="performance-lab-card"></div>
+          <div class="button-row">
+            <button class="primary" type="button" data-action="run-performance-audit">Capture performance snapshot</button>
+            ${routeButton("/admin", "Open Admin Controls")}
+            ${routeButton("/status", "Open Status And Slow Load")}
+          </div>
+        `
+      )}
+      ${card(
+        "How To Frame It",
+        "Keep performance approachable for manual testers and automation learners.",
+        `
+          <ul class="plain-list">
+            <li>Start with page-load timing and slow-resource observations before deeper profiling.</li>
+            <li>Use the slow-network toggle to make timing problems visible in class.</li>
+            <li>End with why performance belongs in the same quality conversation as UI and API checks.</li>
+          </ul>
+        `
+      )}
+    </div>
+  `;
+}
+
+function renderReportsLab() {
+  return `
+    <div class="component-grid">
+      ${card(
+        "Reporting And Evidence",
+        "Wrap up the course by showing students how automation becomes useful when it produces readable evidence.",
+        `
+          <div data-testid="reports-lab-card"></div>
+          <div class="notice">
+            <p><strong>Playwright:</strong> screenshots, traces, videos, HTML report</p>
+            <p><strong>Allure:</strong> richer execution history and trainer-friendly summaries</p>
+          </div>
+          <pre class="code-block">npm run test:e2e
+npm run allure:generate
+npm run allure:open</pre>
+          <div class="button-row">
+            <button class="primary" type="button" data-action="show-report-plan">Show reporting checklist</button>
+            ${routeButton("/coverage-index", "Open Coverage Index")}
+          </div>
+        `
+      )}
+      ${card(
+        "Suggested Closing Sequence",
+        "A clean way to finish the workshop after the capstone flow.",
+        `
+          <ul class="plain-list">
+            <li>Run the capstone flow and point to the output panel for immediate evidence.</li>
+            <li>Show the coverage index to recap what students touched.</li>
+            <li>Open Playwright and Allure reports to connect raw execution to polished reporting.</li>
+          </ul>
+        `
+      )}
+    </div>
+  `;
+}
+
 function renderFlakyDelayedButton() {
   return `
     ${card(
@@ -2265,6 +2424,14 @@ function renderRouteContent(route) {
       return renderFloatingMenu();
     case "/api-ui":
       return renderApiUi();
+    case "/accessibility":
+      return renderAccessibilityLab();
+    case "/responsiveness":
+      return renderResponsivenessLab();
+    case "/performance":
+      return renderPerformanceLab();
+    case "/reports":
+      return renderReportsLab();
     case "/flaky/delayed-button":
       return renderFlakyDelayedButton();
     case "/flaky/race-condition":
@@ -2305,41 +2472,36 @@ function renderRouteContent(route) {
 }
 
 function renderSidebar() {
-  const groups = new Map();
-  ROUTES.filter((route) => route.nav !== false).forEach((route) => {
-    if (!groups.has(route.group)) {
-      groups.set(route.group, []);
-    }
-    groups.get(route.group).push(route);
-  });
-
-  refs.sidebar.innerHTML = NAV_GROUP_ORDER.filter((group) => groups.has(group))
-    .map(
-      (group) => `
-        <section class="nav-group">
-          <h3>${escapeHtml(group)}</h3>
-          ${groups
-            .get(group)
-            .map(
-              (route) => `
-                <a
-                  href="${route.path}"
-                  class="nav-link ${getCurrentPath() === route.path ? "active" : ""}"
-                  data-nav="${route.path}"
-                  data-testid="nav-${route.path.replaceAll("/", "-") || "home"}"
-                >
-                  ${escapeHtml(route.label)}
-                </a>
-              `
-            )
-            .join("")}
-        </section>
-      `
-    )
-    .join("");
+  refs.sidebar.innerHTML = TRAINING_MODULES.map((module) => {
+    const routes = module.paths.map((path) => ROUTE_MAP.get(path)).filter(Boolean);
+    return `
+      <section class="nav-group nav-module">
+        <div class="nav-heading">
+          <h3>${escapeHtml(module.title)}</h3>
+          <p class="nav-group-note">${escapeHtml(module.note)}</p>
+        </div>
+        ${routes
+          .map(
+            (route, index) => `
+              <a
+                href="${route.path}"
+                class="nav-link ${getCurrentPath() === route.path ? "active" : ""}"
+                data-nav="${route.path}"
+                data-testid="nav-${route.path.replaceAll("/", "-") || "home"}"
+              >
+                <span class="lesson-index">${String(index + 1).padStart(2, "0")}</span>
+                <span>${escapeHtml(route.label)}</span>
+              </a>
+            `
+          )
+          .join("")}
+      </section>
+    `;
+  }).join("");
 }
 
 function renderHeroBadges(route) {
+  const lessonContext = getLessonContext(route.path);
   const badges = [
     { label: state.admin.stableMode ? "Stable mode" : "Stable off" },
     { label: state.admin.flakyMode ? "Flaky mode" : "Flaky off", className: state.admin.flakyMode ? "warning" : "" },
@@ -2348,10 +2510,14 @@ function renderHeroBadges(route) {
     { label: `Cart ${cartItemCount()}` }
   ];
 
+  if (lessonContext) {
+    badges.unshift({ label: `Lesson ${lessonContext.index} of ${lessonContext.total}`, className: "lesson" });
+  }
+
   refs.heroBadges.innerHTML = badges
     .map((badge) => `<span class="hero-badge ${badge.className || ""}">${escapeHtml(badge.label)}</span>`)
     .join("");
-  refs.pageGroup.textContent = route.group;
+  refs.pageGroup.textContent = lessonContext ? lessonContext.module.title : route.group;
 }
 
 function renderOutput() {
@@ -2582,7 +2748,9 @@ function applyRouteSetup(route) {
 async function fetchJson(url, options = {}) {
   const delay = scenarioDelayMs(url, 220, 900);
   await sleep(delay);
-  const response = await fetch(url, options);
+  const headers = new Headers(options.headers || {});
+  headers.set("x-qa-playground-client", clientId);
+  const response = await fetch(url, { ...options, headers });
   if (!response.ok) {
     let payload = null;
     try {
@@ -2648,14 +2816,30 @@ function renderRoute() {
   applyRouteSetup(route);
 }
 
-function resetAppState() {
-  state = createDefaultState();
-  saveState();
+async function resetAppState() {
+  let nextState = createDefaultState();
+
+  try {
+    const response = await fetch("/api/reset", {
+      method: "POST",
+      headers: { "x-qa-playground-client": clientId }
+    });
+    if (response.ok) {
+      const payload = await response.json();
+      nextState = normalizeState(payload.state || nextState);
+    }
+  } catch {
+    nextState = createDefaultState();
+  }
+
+  state = nextState;
+  saveState("reset-app");
   setOutput("Reset complete", {
     message: "Application state restored to defaults.",
-    credentials: { username: "student", password: "Password123!" }
+    credentials: { username: "student", password: "Password123!" },
+    seed: state.seed,
+    admin: state.admin
   });
-  fetch("/api/reset", { method: "POST" }).catch(() => {});
   notify("Reset", "The playground has been reset.");
   renderRoute();
 }
@@ -2913,6 +3097,49 @@ function handleClick(event) {
     state.ui.onloadErrorCaptured = false;
     saveState();
     renderRoute();
+    return;
+  }
+
+  if (action === "run-accessibility-audit") {
+    setOutput("Accessibility trainer checklist", {
+      labels: "pass",
+      keyboardOrder: "pass",
+      ariaLiveRegions: "pass",
+      recommendation: "Demonstrate labels, focus order, and live feedback using the form and keyboard routes."
+    });
+    return;
+  }
+
+  if (action === "measure-responsive-layout") {
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    const breakpoint = width >= 1180 ? "desktop" : width >= 760 ? "tablet" : "mobile";
+    setOutput("Responsive snapshot", {
+      width,
+      height,
+      breakpoint,
+      guidance: "Use this reading to explain why selectors should prefer semantics over positional assumptions."
+    });
+    return;
+  }
+
+  if (action === "run-performance-audit") {
+    const navigation = performance.getEntriesByType("navigation")[0];
+    setOutput("Performance snapshot", {
+      domContentLoadedMs: navigation ? Math.round(navigation.domContentLoadedEventEnd) : null,
+      loadEventMs: navigation ? Math.round(navigation.loadEventEnd) : null,
+      resourceCount: performance.getEntriesByType("resource").length,
+      recommendation: "Compare this baseline with Admin slow-network mode and the Status route."
+    });
+    return;
+  }
+
+  if (action === "show-report-plan") {
+    setOutput("Reporting checklist", {
+      execution: "npm run test:e2e",
+      allureGenerate: "npm run allure:generate",
+      artefacts: ["Playwright HTML report", "Allure report", "Result panel snapshots", "Debug logs"]
+    });
     return;
   }
 
@@ -3372,7 +3599,8 @@ function handleChange(event) {
     } else {
       state.admin[name] = checked;
     }
-    saveState();
+    state = normalizeState(state);
+    saveState("admin-toggle");
     logEvent("Admin toggles changed", state.admin);
     renderRoute();
     return;
@@ -3528,6 +3756,10 @@ const ROUTES = [
   { path: "/scrolling/lazy-images", label: "Lazy Images", title: "Scrolling: Lazy Images", description: "Images load only when observed in the viewport.", group: "Scrolling", parent: "/scrolling" },
   { path: "/scrolling/floating-menu", label: "Floating Menu", title: "Scrolling: Floating Menu", description: "Sticky section navigation inside a tall scrolling region.", group: "Scrolling", parent: "/scrolling" },
   { path: "/api-ui", label: "API UI", title: "API UI", description: "Fetch data, handle errors, and post mutations to the local server.", group: "API" },
+  { path: "/accessibility", label: "Accessibility", title: "Quality: Accessibility", description: "Trainer-focused accessibility walkthrough with practical checklist prompts.", group: "API" },
+  { path: "/responsiveness", label: "Responsiveness", title: "Quality: Responsiveness", description: "Viewport and breakpoint coaching page for responsive testing lessons.", group: "API" },
+  { path: "/performance", label: "Performance", title: "Quality: Performance", description: "Performance conversation starter using local browser timings and slow-network toggles.", group: "API" },
+  { path: "/reports", label: "Reports", title: "Quality: Reporting", description: "End-of-course reporting module for Playwright, Allure, and trainer evidence.", group: "API" },
   { path: "/flaky", label: "Flaky Index", title: "Flaky Lab", description: "Entry point for delayed buttons, races, rerenders, random toasts, and typo drift.", group: "Flaky", nav: false },
   { path: "/flaky/delayed-button", label: "Delayed Button", title: "Flaky: Delayed Button", description: "Button becomes clickable after a controlled wait.", group: "Flaky", parent: "/flaky" },
   { path: "/flaky/race-condition", label: "Race Condition", title: "Flaky: Race Condition", description: "Competing async branches create repeatable timing variance.", group: "Flaky", parent: "/flaky" },

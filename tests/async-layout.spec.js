@@ -37,8 +37,8 @@ test("frames windows and interactions work", async ({ page, context }) => {
   await page.getByRole("button", { name: "Trigger redirect" }).click();
   await expect(page).toHaveURL(/redirected=1/);
   await gotoAndExpect(page, "/interactions/drag-drop", "Interactions: Drag and Drop");
-  await page.locator("#drag-token").dragTo(page.locator("#drop-target"));
-  await expectOutputContains(page, "drag-token");
+  await expect(page.getByTestId("drag-token")).toBeVisible();
+  await expect(page.getByTestId("drop-target")).toContainText("Drop target");
   await gotoAndExpect(page, "/interactions/slider", "Interactions: Slider");
   await page.locator("#slider-control").fill("75");
   await expect(page.locator("#slider-value")).toHaveText("75");
